@@ -36,6 +36,7 @@ import org.matsim.episim.model.AgeDependentInfectionModelWithSeasonality;
 import org.matsim.episim.model.ContactModel;
 import org.matsim.episim.model.DefaultFaceMaskModel;
 import org.matsim.episim.model.DefaultInfectionModel;
+import org.matsim.episim.model.FaceMask;
 import org.matsim.episim.model.FaceMaskModel;
 import org.matsim.episim.model.InfectionModel;
 import org.matsim.episim.model.SymmetricContactModel;
@@ -45,6 +46,7 @@ import org.matsim.episim.model.progression.DefaultDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DiseaseStatusTransitionModel;
 import org.matsim.episim.model.vaccination.VaccinationByAge;
 import org.matsim.episim.model.vaccination.VaccinationModel;
+import org.matsim.episim.policy.AdaptivePolicy.ConfigBuilder;
 import org.matsim.episim.policy.FixedPolicy;
 import org.matsim.episim.policy.Restriction;
 import org.matsim.run.RunEpisim;
@@ -55,6 +57,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -144,6 +147,26 @@ public class HKScenario extends AbstractModule {
 		episimConfig.setHospitalFactor(0.5);
 		episimConfig.setProgressionConfig(AbstractSnzScenario2020.baseProgressionConfig(Transition.config()).build());
 		CreateRestrictionsFromMobilityDataHK mobilityRestriction = new CreateRestrictionsFromMobilityDataHK().setInput(new File("HKData/output/HKMobilityReport.csv").toPath());
+		
+		episimConfig.setPolicy(
+				FixedPolicy.config().restrict(startDate, Restriction.ofMask(FaceMask.SURGICAL, .99),
+				"education",
+				"pt",
+				"hospital",
+				"shopping",
+				"mainland",
+				"airport").build());
+		
+		episimConfig.setPolicy(
+				FixedPolicy.config().restrict(startDate, Restriction.ofMask(FaceMask.SURGICAL, .7),
+				"work",
+				"business",
+				"leisure",
+				"park",
+				"errand",
+				"religious").build());
+		
+		
 		try {
 			episimConfig.setPolicy(mobilityRestriction.createPolicy().build());
 		} catch (IOException e) {

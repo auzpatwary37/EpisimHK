@@ -71,24 +71,24 @@ public class ReadAndChangeEventFile{
 			e.printStackTrace();
 		}
 		// 1- Build the doc from the XML file
-		Document doc = DocumentBuilderFactory.newInstance()
-		            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(outEventFileIntermediate+"/output_events-1.0.xml.gz")));
-
-		// 2- Locate the node(s) with xpath
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		NodeList nodes = (NodeList)xpath.evaluate("//*[@actType]",
-		                                          doc, XPathConstants.NODESET);
-		System.out.println(nodes.getLength());
-		// 3- Make the change on the selected nodes
-		for (int idx = 0; idx < nodes.getLength(); idx++) {
-		    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
-		    String val = value.getNodeValue();
-		    value.setNodeValue(actRepl.get(val));
-		}
-
-		// 4- Save the result to a new XML doc
-		Transformer xformer = TransformerFactory.newInstance().newTransformer();
-		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
+//		Document doc = DocumentBuilderFactory.newInstance()
+//		            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(outEventFileIntermediate+"/output_events-1.0.xml.gz")));
+//
+//		// 2- Locate the node(s) with xpath
+//		XPath xpath = XPathFactory.newInstance().newXPath();
+//		NodeList nodes = (NodeList)xpath.evaluate("//*[@actType]",
+//		                                          doc, XPathConstants.NODESET);
+//		System.out.println(nodes.getLength());
+//		// 3- Make the change on the selected nodes
+//		for (int idx = 0; idx < nodes.getLength(); idx++) {
+//		    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
+//		    String val = value.getNodeValue();
+//		    value.setNodeValue(actRepl.get(val));
+//		}
+//
+//		// 4- Save the result to a new XML doc
+//		Transformer xformer = TransformerFactory.newInstance().newTransformer();
+//		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
 		
 
 		Population pop = PopulationUtils.readPopulation(outEventFileIntermediate+"/population1.0.xml.gz");
