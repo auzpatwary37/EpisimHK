@@ -7,12 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -23,22 +20,42 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.scenarioCreation.DownSampleScenario;
+import org.matsim.scenarioCreation.DownloadGoogleMobilityReport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class ReadAndChangeEventFile{
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
-		String inputFile = "output\\scenario\\output_events-0.1.xml";
-		String outputFile = "output\\scenario\\output_events-0.1_cleaned.xml";
+		String inputFile = "HKData/output_events.xml.gz";//"output\\scenario\\output_events-0.1.xml";
+		String outputFile = "HKData/output/eventsCleaned_.1.xml";
+		String outEventFileIntermediate = "HKData/output/eventsIntermediate_0.1";
+		String populationFileLoc = "HKData/output_plans.xml.gz";
+		String outputPopulationFileLocation = "HKData/output/output_plans_cleaned_0.1.xml.gz";
+		String googleMobilityDataRecord = "HKData/output/HKMobilityReport.csv";
+		
+		String[] args1 = new String[]{
+				//DownSampleScenario.class.getName(),
+				Double.toString(1.0),
+				"--population", populationFileLoc,
+				"--events", inputFile,
+				"--output", outEventFileIntermediate
+		};
+		//DownSampleScenario.main(args1);
+
 		Map<String,String> actRepl = new HashMap<>();
 		try {
-			BufferedReader fr = new BufferedReader(new FileReader(new File("output/scenario/acts.csv")));
+			BufferedReader fr = new BufferedReader(new FileReader(new File("HKData\\acts.csv")));
+			
 			String line = null;
 			
 			while((line = fr.readLine())!=null) {
@@ -55,7 +72,7 @@ public class ReadAndChangeEventFile{
 		}
 		// 1- Build the doc from the XML file
 		Document doc = DocumentBuilderFactory.newInstance()
-		            .newDocumentBuilder().parse(new InputSource(inputFile));
+		            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(outEventFileIntermediate+"/output_events-1.0.xml.gz")));
 
 		// 2- Locate the node(s) with xpath
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -73,6 +90,27 @@ public class ReadAndChangeEventFile{
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
 		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
 		
+
+		Population pop = PopulationUtils.readPopulation(outEventFileIntermediate+"/population1.0.xml.gz");
+		pop.getPersons().values().stream().forEach(p->{
+			p.getPlans().forEach(pl->{
+				pl.getPlanElements().forEach(pe->{
+					if(pe instanceof Activity) {
+						Activity a = (Activity)pe;
+						a.setType(actRepl.get(a.getType()));
+					}
+				});
+			});
+		});
+		new PopulationWriter(pop).write(outputPopulationFileLocation);
+		
+		args1 = new String[]{
+				"--region", "HK",
+				"--sub-region","",
+				"--from","2020-02-01",
+				"--output", googleMobilityDataRecord
+		};
+		DownloadGoogleMobilityReport.main(args1);
 	}
 	
 
