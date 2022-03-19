@@ -36,21 +36,26 @@ import org.xml.sax.SAXException;
 public class ReadAndChangeEventFile{
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
+		
+		Double proportion = 0.1;
+		
 		String inputFile = "HKData/output_events.xml.gz";//"output\\scenario\\output_events-0.1.xml";
-		String outputFile = "HKData/output/eventsCleaned_.1.xml";
-		String outEventFileIntermediate = "HKData/output/eventsIntermediate_0.1";
+		String outEventFileIntermediate = "HKData/output/eventsHongKong_"+proportion;
+		String outputFile = outEventFileIntermediate+"/events_cleaned.xml";
 		String populationFileLoc = "HKData/output_plans.xml.gz";
-		String outputPopulationFileLocation = "HKData/output/output_plans_cleaned_0.1.xml.gz";
+		String outputPopulationFileLocation = outEventFileIntermediate+"/output_plans_cleaned.xml.gz";
 		String googleMobilityDataRecord = "HKData/output/HKMobilityReport.csv";
+		
+		
 		
 		String[] args1 = new String[]{
 				//DownSampleScenario.class.getName(),
-				Double.toString(1.0),
+				Double.toString(proportion),
 				"--population", populationFileLoc,
 				"--events", inputFile,
 				"--output", outEventFileIntermediate
 		};
-		//DownSampleScenario.main(args1);
+		DownSampleScenario.main(args1);
 
 		Map<String,String> actRepl = new HashMap<>();
 		try {
@@ -71,27 +76,31 @@ public class ReadAndChangeEventFile{
 			e.printStackTrace();
 		}
 		// 1- Build the doc from the XML file
-//		Document doc = DocumentBuilderFactory.newInstance()
-//		            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(outEventFileIntermediate+"/output_events-1.0.xml.gz")));
-//
-//		// 2- Locate the node(s) with xpath
-//		XPath xpath = XPathFactory.newInstance().newXPath();
-//		NodeList nodes = (NodeList)xpath.evaluate("//*[@actType]",
-//		                                          doc, XPathConstants.NODESET);
-//		System.out.println(nodes.getLength());
-//		// 3- Make the change on the selected nodes
-//		for (int idx = 0; idx < nodes.getLength(); idx++) {
-//		    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
-//		    String val = value.getNodeValue();
-//		    value.setNodeValue(actRepl.get(val));
-//		}
-//
-//		// 4- Save the result to a new XML doc
-//		Transformer xformer = TransformerFactory.newInstance().newTransformer();
-//		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
+		Document doc = DocumentBuilderFactory.newInstance()
+		            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(outEventFileIntermediate+"/output_events-"+proportion+".xml.gz")));
+
+		// 2- Locate the node(s) with xpath
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		NodeList nodes = (NodeList)xpath.evaluate("//*[@actType]",
+		                                          doc, XPathConstants.NODESET);
+		System.out.println(nodes.getLength());
+		// 3- Make the change on the selected nodes
+		for (int idx = 0; idx < nodes.getLength(); idx++) {
+		    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
+		    String val = value.getNodeValue();
+		    if(actRepl.containsKey(val)) {
+		    	value.setNodeValue(actRepl.get(val));
+		    }else {
+		    	System.out.println("No mapping found for activity "+ val);
+		    }
+		}
+
+		// 4- Save the result to a new XML doc
+		Transformer xformer = TransformerFactory.newInstance().newTransformer();
+		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
 		
 
-		Population pop = PopulationUtils.readPopulation(outEventFileIntermediate+"/population1.0.xml.gz");
+		Population pop = PopulationUtils.readPopulation(outEventFileIntermediate+"/population"+proportion+".xml.gz");
 		pop.getPersons().values().stream().forEach(p->{
 			p.getPlans().forEach(pl->{
 				pl.getPlanElements().forEach(pe->{
