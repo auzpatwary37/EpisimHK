@@ -44,6 +44,7 @@ import org.matsim.episim.model.Transition;
 import org.matsim.episim.model.progression.AgeDependentDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DefaultDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DiseaseStatusTransitionModel;
+import org.matsim.episim.model.vaccination.RandomVaccination;
 import org.matsim.episim.model.vaccination.VaccinationByAge;
 import org.matsim.episim.model.vaccination.VaccinationModel;
 import org.matsim.episim.policy.AdaptivePolicy.ConfigBuilder;
@@ -105,7 +106,7 @@ public class HKScenario extends AbstractModule {
 		bind(ContactModel.class).to(SymmetricContactModel.class).in(Singleton.class);
 		bind(DiseaseStatusTransitionModel.class).to(DefaultDiseaseStatusTransitionModel.class).in(Singleton.class);
 		bind(InfectionModel.class).to(DefaultInfectionModel.class).in(Singleton.class);
-		bind(VaccinationModel.class).to(VaccinationByAge.class).in(Singleton.class);
+		bind(VaccinationModel.class).to(RandomVaccination.class).in(Singleton.class);
 		bind(FaceMaskModel.class).to(DefaultFaceMaskModel.class).in(Singleton.class);
 	}
 	@SuppressWarnings("deprecation")
@@ -113,7 +114,7 @@ public class HKScenario extends AbstractModule {
 	@Singleton
 	public Config config() {
 		
-		Population pop = PopulationUtils.readPopulation("output\\scenario\\population0.1_cleaned.xml.gz");
+		Population pop = PopulationUtils.readPopulation("HKData\\output\\eventsHongKong_0.1\\output_plans_cleaned.xml.gz");
 		Set<String> acts = new HashSet<>();
 		pop.getPersons().entrySet().stream().forEach(p->{
 			p.getValue().getSelectedPlan().getPlanElements().stream().forEach(pl->{
@@ -133,7 +134,7 @@ public class HKScenario extends AbstractModule {
 		// String episimEvents_1pct = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct/output-berlin-v5.4-1pct/berlin-v5.4-1pct.output_events_for_episim.xml.gz";
 		// String episimEvents_10pct = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-10pct-schools/output-berlin-v5.4-10pct-schools/berlin-v5.4-10pct-schools.output_events_for_episim.xml.gz";
 
-		String url = "HKData\\output\\eventsCleaned_.1.xml";
+		String url = "HKData\\output\\eventsHongKong_0.1\\events_cleaned.xml";
 
 		episimConfig.setInputEventsFile(url);
 
@@ -209,8 +210,8 @@ public class HKScenario extends AbstractModule {
 			int offset = 46;
 			tracingConfig.setPutTraceablePersonsInQuarantineAfterDay(offset);
 			tracingConfig.setTracingProbability(0.5);
-			tracingConfig.setTracingPeriod_days(2);
-			tracingConfig.setMinContactDuration_sec(15 * 60.);
+			tracingConfig.setTracingPeriod_days(2); //Is it day from infection? 2 means quaratine for 2 days?
+			tracingConfig.setMinContactDuration_sec(15 * 60.); //What does it mean?
 			tracingConfig.setQuarantineHouseholdMembers(true);
 			tracingConfig.setEquipmentRate(1.);
 			tracingConfig.setTracingDelay_days(5);
