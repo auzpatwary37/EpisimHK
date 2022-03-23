@@ -45,12 +45,12 @@ public class ReadAndChangeEventFile{
 		
 		String[] args1 = new String[]{
 				//DownSampleScenario.class.getName(),
-				Double.toString(1.0),
+				Double.toString(.1),
 				"--population", populationFileLoc,
 				"--events", inputFile,
 				"--output", outEventFileIntermediate
 		};
-		//DownSampleScenario.main(args1);
+		DownSampleScenario.main(args1);
 
 		Map<String,String> actRepl = new HashMap<>();
 		try {
