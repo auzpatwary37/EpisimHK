@@ -17,21 +17,21 @@ public static void main(String[] args) {
 	String outputFileLoc = "MontrealData/Montreal0.1";
 	String googleDataLoc = "MontrealData/googleData.csv";
 	String weatherDataLoc = "MontrealData/weatherData.csv";
-	
+
 	double scale = 1.0;
-	
-	Set<String> acts = new HashSet<>();
-	Population pop = PopulationUtils.readPopulation(popFile);
-	pop.getPersons().entrySet().stream().forEach(p->{
-		p.getValue().getSelectedPlan().getPlanElements().forEach(pl->{
-			if(pl instanceof Activity) {
-				Activity a = (Activity)pl;
-				acts.add(a.getType());
-				System.out.println(a.getType());
-			}
-		});
-	});
-	
+//	{
+//		Set<String> acts = new HashSet<>();
+//		Population pop = PopulationUtils.readPopulation(popFile);
+//		pop.getPersons().entrySet().stream().forEach(p -> {
+//			p.getValue().getSelectedPlan().getPlanElements().forEach(pl -> {
+//				if (pl instanceof Activity) {
+//					Activity a = (Activity) pl;
+//					acts.add(a.getType());
+//					System.out.println(a.getType());
+//				}
+//			});
+//		});
+//	}
 	String[] args1 = new String[]{
 			//DownSampleScenario.class.getName(),
 			Double.toString(scale),
@@ -39,7 +39,8 @@ public static void main(String[] args) {
 			"--events", eventFile,
 			"--output", outputFileLoc
 	};
-	DownSampleScenario.main(args1);
+
+	//DownSampleScenario.main(args1);
 	
 	args1 = new String[]{
 			"--region", "CA",
