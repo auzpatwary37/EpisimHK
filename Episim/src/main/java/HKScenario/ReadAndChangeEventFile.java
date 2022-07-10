@@ -39,27 +39,26 @@ import org.xml.sax.SAXException;
 public class ReadAndChangeEventFile{
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException, TransformerFactoryConfigurationError, TransformerException {
-		
+
 		Double proportion = 0.1;
-		
+
 		String inputFile = "HKData/output_events.xml.gz";//"output\\scenario\\output_events-0.1.xml";
-		String outEventFileIntermediate = "HKData/output/eventsHongKong_"+proportion;
-		String outputFile = outEventFileIntermediate+"/events_cleaned.xml";
+		String outEventFileIntermediate = "HKData/output/eventsHongKong_" + proportion;
+		String outputFile = outEventFileIntermediate + "/events_cleaned.xml";
 		String populationFileLoc = "HKData/output_plans.xml.gz";
 		String populationFileLoc1 = "HKData/output_plans_noGV_age.xml.gz";
-		String outputPopulationFileLocation = outEventFileIntermediate+"/output_plans_cleaned.xml.gz";
+		String outputPopulationFileLocation = outEventFileIntermediate + "/output_plans_cleaned.xml.gz";
 		String googleMobilityDataRecord = "HKData/output/HKMobilityReport.csv";
 		String personAgeFile = "HKData/memberAge.csv";
-		
-		//________________________Delete goods vehicle and insert age____________________________________________
-		Map<String,Double> ageOfPersons = new HashMap<>();
-		
+
+		Map<String, Double> ageOfPersons = new HashMap<>();
+
 		try {
 			BufferedReader bf1 = new BufferedReader(new FileReader(new File(personAgeFile)));
-			
+
 			String line = null;
-			
-			while((line = bf1.readLine())!=null) {
+
+			while ((line = bf1.readLine()) != null) {
 				String[] part = line.split(",");
 				ageOfPersons.put(part[0], Double.parseDouble(part[1]));
 			}
@@ -70,31 +69,31 @@ public class ReadAndChangeEventFile{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
-//		{
-//		Population pp = PopulationUtils.readPopulation(populationFileLoc);
-//		Map<Id<Person>, ? extends Person>personMap = new HashMap<>(pp.getPersons());
-//		
-//		
-//		personMap.entrySet().forEach(e->{
-//			if(PopulationUtils.getSubpopulation(e.getValue()).contains("GV")) {
-//				pp.removePerson(e.getKey());
-//				return;
-//			}else {
-//				String mId = e.getKey().toString().split("_")[0]+"_"+e.getKey().toString().split("_")[1];
-//				if(ageOfPersons.get(mId)!=null) {
-//					e.getValue().getAttributes().putAttribute("age",ageOfPersons.get(mId));
-//				}else {
-//					throw new IllegalArgumentException("No Age found for person Id = "+e.getKey().toString());
-//				}
-//			}
-//			
-//		});
-//		
-//		new PopulationWriter(pp).write(populationFileLoc1);
-//		}
-		
-		
+
+		}
+		{
+			Population pp = PopulationUtils.readPopulation(populationFileLoc);
+			Map<Id<Person>, ? extends Person> personMap = pp.getPersons();
+
+			personMap.entrySet().forEach(e -> {
+				if (PopulationUtils.getSubpopulation(e.getValue()).contains("GV")) {
+					pp.removePerson(e.getKey());
+					return;
+				} else {
+					String mId = e.getKey().toString().split("_")[0] + "_" + e.getKey().toString().split("_")[1];
+					if (ageOfPersons.get(mId) != null) {
+						e.getValue().getAttributes().putAttribute("age", ageOfPersons.get(mId));
+					} else {
+						throw new IllegalArgumentException("No Age found for person Id = " + e.getKey().toString());
+					}
+				}
+
+			});
+
+			new PopulationWriter(pp).write(populationFileLoc1);
+		}
+
+
 		//____________cerate episim scenario(event file)______________________
 		String[] args1 = new String[]{
 				//DownSampleScenario.class.getName(),

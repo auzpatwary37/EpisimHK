@@ -18,8 +18,9 @@ public static void main(String[] args) {
 	String outputFileLoc = "MontrealData/Montreal0.1";
 	String googleDataLoc = "MontrealData/googleData.csv";
 	String weatherDataLoc = "MontrealData/weatherData.csv";
-	
+
 	double scale = 1.0;
+
 	
 //	Set<String> acts = new HashSet<>();
 //	Population pop = PopulationUtils.readPopulation(popFile);
@@ -37,6 +38,7 @@ public static void main(String[] args) {
 //	acts.forEach(a->System.out.println(a));
 //	
 	
+
 	String[] args1 = new String[]{
 			//DownSampleScenario.class.getName(),
 			Double.toString(scale),
@@ -45,7 +47,8 @@ public static void main(String[] args) {
 			"--facilities",facilityFile,
 			"--output", outputFileLoc
 	};
-	DownSampleScenario.main(args1);
+
+	//DownSampleScenario.main(args1);
 	
 	args1 = new String[]{
 			"--region", "CA",
