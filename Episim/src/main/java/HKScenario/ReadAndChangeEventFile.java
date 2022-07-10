@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -50,7 +51,6 @@ public class ReadAndChangeEventFile{
 		String googleMobilityDataRecord = "HKData/output/HKMobilityReport.csv";
 		String personAgeFile = "HKData/memberAge.csv";
 		
-		
 		//________________________Delete goods vehicle and insert age____________________________________________
 		Map<String,Double> ageOfPersons = new HashMap<>();
 		
@@ -71,25 +71,29 @@ public class ReadAndChangeEventFile{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+//		{
+//		Population pp = PopulationUtils.readPopulation(populationFileLoc);
+//		Map<Id<Person>, ? extends Person>personMap = new HashMap<>(pp.getPersons());
+//		
+//		
+//		personMap.entrySet().forEach(e->{
+//			if(PopulationUtils.getSubpopulation(e.getValue()).contains("GV")) {
+//				pp.removePerson(e.getKey());
+//				return;
+//			}else {
+//				String mId = e.getKey().toString().split("_")[0]+"_"+e.getKey().toString().split("_")[1];
+//				if(ageOfPersons.get(mId)!=null) {
+//					e.getValue().getAttributes().putAttribute("age",ageOfPersons.get(mId));
+//				}else {
+//					throw new IllegalArgumentException("No Age found for person Id = "+e.getKey().toString());
+//				}
+//			}
+//			
+//		});
+//		
+//		new PopulationWriter(pp).write(populationFileLoc1);
+//		}
 		
-		Population pp = PopulationUtils.readPopulation(populationFileLoc);
-		Map<Id<Person>, ? extends Person>personMap = pp.getPersons();
-		personMap.entrySet().forEach(e->{
-			if(PopulationUtils.getSubpopulation(e.getValue()).contains("GV")) {
-				pp.removePerson(e.getKey());
-				return;
-			}else {
-				String mId = e.getKey().toString().split("_")[0]+e.getKey().toString().split("_")[1];
-				if(ageOfPersons.get(mId)!=null) {
-					e.getValue().getAttributes().putAttribute("age",ageOfPersons.get(mId));
-				}else {
-					throw new IllegalArgumentException("No Age found for person Id = "+e.getKey().toString());
-				}
-			}
-			
-		});
-		
-		new PopulationWriter(pp).write(populationFileLoc1);
 		
 		//____________cerate episim scenario(event file)______________________
 		String[] args1 = new String[]{
@@ -99,7 +103,7 @@ public class ReadAndChangeEventFile{
 				"--events", inputFile,
 				"--output", outEventFileIntermediate
 		};
-		DownSampleScenario.main(args1);
+//		DownSampleScenario.main(args1);
 
 
 		Map<String,String> actRepl = new HashMap<>();

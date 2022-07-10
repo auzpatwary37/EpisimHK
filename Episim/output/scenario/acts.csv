@@ -1,0 +1,172 @@
+Usual place of work_39600.0,work
+Travel agent,errand
+Residential,home
+Police station / immigration department / other government offices_StartOrEnd,errand
+Usual place of work_StartOrEnd,work
+Post office,errand
+Depot / Ship repair yards,other
+Clubhouses / Yacht clubs / Golf clubs,leisure
+Sewage treatment plants,other
+Government and Community organization_StartOrEnd,errand
+Fishing site,leisure
+Homes for the aged / Nursing homes,family
+Slaughterhouses_StartOrEnd,other
+Holiday villages / Holiday camp_StartOrEnd,leisure
+Racecourse_StartOrEnd,leisure
+Fishing site_StartOrEnd,leisure
+Cultural / community center library and arts / museum,leisure
+Cemeteries / crematoria,religious
+Hospital / medical center / clinic,hospital
+Carrying/meeting family_StartOrEnd,family
+Securities company / investment center,business
+Cinema/concert karaoke and other entertainment facilities (includindg nightclubs / bathhouses / massage establishments,leisure
+Power plants / Electric substations / Bulk infeed substations,other
+Park/playground/sports ground/court/gym centre/swimming pool/beach,leisure
+Vehicle scrap yard_StartOrEnd,other
+Waterfront (for recreation),leisure
+Vehicle repair centers / Vehicle examination centers / Garage / Vehicle cleansing services sites,errand
+Public parking area_StartOrEnd,other
+Homes for the aged / Nursing homes_StartOrEnd,family
+School/educational institution that other people studied,errand
+Churches,religious
+Market/shopping arcade/shops/ supermarket (excluding restaurant cinema karaoke)_StartOrEnd,shopping
+Tutorial center,education
+Beauty salon/Barber shop,errand
+Driving / taking a ride,other
+Construction site_StartOrEnd,other
+Convention centers / Showrooms_StartOrEnd,business
+Kwai Tsing container terminals_StartOrEnd,other
+Bus / public light bus terminal / stop / MTR / LRT station / pier (non-transport purpose e.g. settle/get things),errand
+Industrial and commercial buildings (non-work purpose)_StartOrEnd,other
+Depot / Ship repair yards_StartOrEnd,other
+Tunnels / Bridges / Tolls / Roads / Roadside,other
+Hotel_StartOrEnd,hotel
+Travel agent_StartOrEnd,errand
+Clubhouses / Yacht clubs / Golf clubs_StartOrEnd,leisure
+Usual place of work_25200.0,work
+Usual place of work_10800.0,work
+Church / temple_StartOrEnd,religious
+Open storage and Port back-up facilities,other
+Dormitory_StartOrEnd,home
+Country park / countryside area_StartOrEnd,leisure
+Chek Lap Kok Airport (non-departure or arrival)_StartOrEnd,airport
+Office,work
+Other places of work_StartOrEnd,work
+other,errand
+Water treatment works_StartOrEnd,errand
+Bank,business
+Telephone exchange buildings,other
+Home of family member/relative/friend,leisure
+Funeral home / cemetery / crematorium / bone ash space_StartOrEnd,religious
+Airport passenger terminal_StartOrEnd,airport
+Petrol station / Oil depots / LPG filling station_StartOrEnd,errand
+Churches_StartOrEnd,religious
+Places of work of other people (non-work purpose),errand
+Sewage treatment plants_StartOrEnd,other
+Country park / countryside area,leisure
+Funeral parlors,religious
+Farms / Fishing grounds / Horticultural sites_StartOrEnd,leisure
+Telephone exchange buildings_StartOrEnd,business
+Market/shopping arcade/shops/ supermarket (excluding restaurant cinema karaoke),shopping
+On street / roaming the street / no particular destination,other
+Garage / car repair center_StartOrEnd,errand
+Examination venue_StartOrEnd,education
+Residential_StartOrEnd,home
+Public parking area,errand
+Airport passenger terminal,airport
+Sports centers / Sports grounds / Pitches / Courts,leisure
+Home of family member/relative/friend_StartOrEnd,family
+Usual place of work_28800.0,work
+Elderly homes,family
+pt interaction,pt interaction
+Food premise: restaurant caf pub etc._StartOrEnd,restaurants
+Carrying/meeting family,family
+Another home / second home (occassional)_StartOrEnd,home
+Cemeteries / crematoria_StartOrEnd,religious
+On street / roaming the street / no particular destination_StartOrEnd,other
+Bus / public light bus terminal / stop / MTR / LRT station / pier (non-transport purpose e.g. settle/get things)_StartOrEnd,errand
+Sports centers / Sports grounds / Pitches / Courts_StartOrEnd,leisure
+Convention centers / Showrooms,leisure
+Industrial and commercial buildings (non-work purpose),other
+Farms / Fishing grounds / Horticultural sites,leisure
+Usual place of work_32400.0,work
+Park / Theme park,leisure
+Places of work of other people (non-work purpose)_StartOrEnd,errand
+Chek Lap Kok Airport (non-departure or arrival),airport
+Volunteer center,leisure
+Other places of work,work
+Garage / car repair center,errand
+Shop / Restaurant_StartOrEnd,restaurants
+Usual place of work_36000.0,work
+Logistics centers,business
+Funeral parlors_StartOrEnd,religious
+Petrol station / Oil depots / LPG filling station,errand
+Logistics centers_StartOrEnd,business
+Office_StartOrEnd,work
+Holiday camp,leisure
+Newspaper stands_StartOrEnd,errand
+Food premise: restaurant caf pub etc.,restaurants
+Cultural / community center library and arts / museum_StartOrEnd,leisure
+Police station / immigration department / other government offices,errand
+Bank_StartOrEnd,business
+Funeral home / cemetery / crematorium / bone ash space,religious
+Hospital / medical center / clinic_StartOrEnd,hospital
+Learning center / learning center,education
+Vehicle scrap yard,other
+Recorder house,other
+Anywhere in the Mainland_StartOrEnd,mainland
+Government and Community organization,errand
+Public refuse collection Points / Refuse transfer stations / Refuse collection stations,errand
+Warehouse_StartOrEnd,business
+Television stations,business
+Newspaper stands,errand
+Park / Theme park_StartOrEnd,leisure
+Holiday villages / Holiday camp,leisure
+Church / temple,religious
+Refuse sorting facilities,errand
+Hotel,hotel
+Warehouse,business
+Beauty salon/Barber shop_StartOrEnd,errand
+Examination venue,education
+Farmland,leisure
+Factory,business
+Water treatment works,business
+Temple_StartOrEnd,religious
+Holiday camp_StartOrEnd,leisure
+Boundary Control Point_StartOrEnd,mainland
+Tunnels / Bridges / Tolls / Roads / Roadside_StartOrEnd,errand
+Public refuse collection Points / Refuse transfer stations / Refuse collection stations_StartOrEnd,errand
+Usual place of work_18000.0,work
+Dormitory,home
+Factory_StartOrEnd,business
+School,education
+School/educational institution that other people studied_StartOrEnd,errand
+Learning center / learning center_StartOrEnd,education
+Usual place of work_14400.0,work
+Usual place of work_21600.0,work
+Home,home
+Television stations_StartOrEnd,other
+Home_StartOrEnd,home
+Tourist attractions_StartOrEnd,leisure
+Vehicle repair centers / Vehicle examination centers / Garage / Vehicle cleansing services sites_StartOrEnd,errand
+Power plants / Electric substations / Bulk infeed substations_StartOrEnd,business
+Clinic and Hospital_StartOrEnd,hospital
+Elderly homes_StartOrEnd,family
+Slaughterhouses,other
+Pumping station_StartOrEnd,errand
+Recorder house_StartOrEnd,business
+Post office_StartOrEnd,errand
+Racecourse,leisure
+Cinema/concert karaoke and other entertainment facilities (includindg nightclubs / bathhouses / massage establishments_StartOrEnd,leisure
+Public transport stations / stops / piers,other
+Public transport stations / stops / piers_StartOrEnd,errand
+School/educational institution that oneself studied,education
+Tutorial center_StartOrEnd,education
+School_StartOrEnd,education
+Open storage and Port back-up facilities_StartOrEnd,business
+Construction site,business
+Park/playground/sports ground/court/gym centre/swimming pool/beach_StartOrEnd,leisure
+Shop / Restaurant,restaurants
+School/educational institution that oneself studied_StartOrEnd,education
+Driving / taking a ride_StartOrEnd,leisure
+Kwai Tsing container terminals,business
