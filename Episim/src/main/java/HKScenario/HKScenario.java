@@ -114,7 +114,7 @@ public class HKScenario extends AbstractModule {
 	@Singleton
 	public Config config() {
 		
-		Population pop = PopulationUtils.readPopulation("HKData\\output\\eventsHongKong_0.1\\output_plans_cleaned.xml.gz");
+		Population pop = PopulationUtils.readPopulation("HKData/output/eventsHongKong_0.1/output_plans_cleaned.xml.gz");
 		Set<String> acts = new HashSet<>();
 		pop.getPersons().entrySet().stream().forEach(p->{
 			p.getValue().getSelectedPlan().getPlanElements().stream().forEach(pl->{
@@ -127,14 +127,14 @@ public class HKScenario extends AbstractModule {
 		EpisimConfigGroup episimConfig = ConfigUtils.addOrGetModule(config, EpisimConfigGroup.class);
 
 		// Optional network
-		config.network().setInputFile("HKData\\output_network.xml.gz");
+		config.network().setInputFile("HKData/output_network.xml.gz");
 		// config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-10pct/input/berlin-v5-network.xml.gz");
 
 		// String episimEvents_1pct = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct-schools/output-berlin-v5.4-1pct-schools/berlin-v5.4-1pct-schools.output_events_for_episim.xml.gz";
 		// String episimEvents_1pct = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct/output-berlin-v5.4-1pct/berlin-v5.4-1pct.output_events_for_episim.xml.gz";
 		// String episimEvents_10pct = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-10pct-schools/output-berlin-v5.4-10pct-schools/berlin-v5.4-10pct-schools.output_events_for_episim.xml.gz";
 
-		String url = "HKData\\output\\eventsHongKong_0.1\\events_cleaned.xml";
+		String url = "HKData/output/eventsHongKong_0.1/events_cleaned.xml";
 
 		episimConfig.setInputEventsFile(url);
 

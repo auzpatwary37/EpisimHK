@@ -78,7 +78,7 @@ public class CreateRestrictionsFromMobilityDataHK implements RestrictionInput {
 
 		FixedPolicy.ConfigBuilder builder = FixedPolicy.config();
 
-		for (Map.Entry<String, Object2DoubleMap<LocalDate>> e : changes.entrySet()) {
+		for (Map.Entry<String, Object2DoubleMap<LocalDate>> e : changes.entrySet()) {// the map is Map<actType,Map<Date,ReductionFromBaseLine>>
 
 			Object2DoubleMap<LocalDate> values = e.getValue();
 			LocalDate start = Objects.requireNonNull(Iterables.getFirst(values.keySet(), null), "CSV is empty");
@@ -86,7 +86,8 @@ public class CreateRestrictionsFromMobilityDataHK implements RestrictionInput {
 			RestrictionInput.resampleAvgWeekday(values, start, (date, f) -> {
 
 				String[] acts = MAPPING.get(e.getKey()).toArray(new String[0]);
-				double frac = 1.0;
+				double frac = 1.0+f/100;
+				if(frac>1)frac=1.0;
 				builder.restrict(date, frac, acts);
 			});
 

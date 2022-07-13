@@ -86,7 +86,8 @@ public class CreateRestrictionsFromMobilityDataMontreal implements RestrictionIn
 			RestrictionInput.resampleAvgWeekday(values, start, (date, f) -> {
 
 				String[] acts = MAPPING.get(e.getKey()).toArray(new String[0]);
-				double frac = 1.0;
+				double frac = 1.0+f/100;
+				if(frac>1)frac = 1;
 				builder.restrict(date, frac, acts);
 			});
 
