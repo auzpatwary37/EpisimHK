@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -50,8 +51,6 @@ public class ReadAndChangeEventFile{
 		String googleMobilityDataRecord = "HKData/output/HKMobilityReport.csv";
 		String personAgeFile = "HKData/memberAge.csv";
 
-
-		//________________________Delete goods vehicle and insert age____________________________________________
 		Map<String, Double> ageOfPersons = new HashMap<>();
 
 		try {
@@ -70,6 +69,7 @@ public class ReadAndChangeEventFile{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+
 		}
 		{
 			Population pp = PopulationUtils.readPopulation(populationFileLoc);
@@ -93,6 +93,7 @@ public class ReadAndChangeEventFile{
 			new PopulationWriter(pp).write(populationFileLoc1);
 		}
 
+
 		//____________cerate episim scenario(event file)______________________
 		String[] args1 = new String[]{
 				//DownSampleScenario.class.getName(),
@@ -101,7 +102,7 @@ public class ReadAndChangeEventFile{
 				"--events", inputFile,
 				"--output", outEventFileIntermediate
 		};
-		DownSampleScenario.main(args1);
+//		DownSampleScenario.main(args1);
 
 
 		Map<String,String> actRepl = new HashMap<>();

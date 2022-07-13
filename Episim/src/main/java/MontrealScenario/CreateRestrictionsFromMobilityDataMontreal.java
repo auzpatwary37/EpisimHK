@@ -28,7 +28,9 @@ public class CreateRestrictionsFromMobilityDataMontreal implements RestrictionIn
 
 	private final static Map<String, List<String>> MAPPING = Map.of(
 			"grocery_and_pharmacy", List.of("shop"),
+
 			"parks", List.of("leisure"),
+
 			"residential", List.of("home"),
 			"retail_and_recreation", List.of("leisure"),
 			"transit_stations", List.of("pt"),
