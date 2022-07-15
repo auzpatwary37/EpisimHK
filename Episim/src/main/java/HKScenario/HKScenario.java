@@ -31,6 +31,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.episim.EpisimConfigGroup;
 import org.matsim.episim.TracingConfigGroup;
+import org.matsim.episim.VaccinationConfigGroup;
+import org.matsim.episim.VirusStrainConfigGroup;
+import org.matsim.episim.VirusStrainConfigGroup.StrainParams;
 import org.matsim.episim.TracingConfigGroup.CapacityType;
 import org.matsim.episim.model.AgeDependentInfectionModelWithSeasonality;
 import org.matsim.episim.model.ContactModel;
@@ -41,6 +44,8 @@ import org.matsim.episim.model.FaceMaskModel;
 import org.matsim.episim.model.InfectionModel;
 import org.matsim.episim.model.SymmetricContactModel;
 import org.matsim.episim.model.Transition;
+import org.matsim.episim.model.VaccinationType;
+import org.matsim.episim.model.VirusStrain;
 import org.matsim.episim.model.progression.AgeDependentDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DefaultDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DiseaseStatusTransitionModel;
@@ -51,6 +56,7 @@ import org.matsim.episim.policy.AdaptivePolicy.ConfigBuilder;
 import org.matsim.episim.policy.FixedPolicy;
 import org.matsim.episim.policy.Restriction;
 import org.matsim.run.RunEpisim;
+import org.matsim.run.batch.StrainPaper;
 import org.matsim.run.modules.AbstractSnzScenario2020;
 import org.matsim.scenarioCreation.DownloadGoogleMobilityReport;
 
@@ -147,6 +153,8 @@ public class HKScenario extends AbstractModule {
 		
 		episimConfig.setHospitalFactor(0.5);
 		episimConfig.setProgressionConfig(AbstractSnzScenario2020.baseProgressionConfig(Transition.config()).build());
+		//episimConfig.setProgressionConfig(Transition.config()
+		
 		CreateRestrictionsFromMobilityDataHK mobilityRestriction = new CreateRestrictionsFromMobilityDataHK().setInput(new File("HKData/output/HKMobilityReport.csv").toPath());
 		
 		episimConfig.setPolicy(
@@ -175,9 +183,9 @@ public class HKScenario extends AbstractModule {
 			e.printStackTrace();
 		}
 		long closingIteration = 14;
-
+		
 		addDefaultParams(episimConfig,acts);
-
+		episimConfig.setMaxContacts(4);
 		int spaces = 20;
 		config.controler().setOutputDirectory("HKData/output/0.01Percent");
 		//contact intensities
@@ -223,6 +231,36 @@ public class HKScenario extends AbstractModule {
 					LocalDate.of(2020, 6, 15), tracingCapacity
 			));
 		}
+		
+		VaccinationConfigGroup group = ConfigUtils.addOrGetModule(config, VaccinationConfigGroup.class);
+		group.getOrAddParams(VaccinationType.mRNA)
+		.setDaysBeforeFullEffect(30)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(10, 0.5)
+				.atDay(20, 0.8)
+				.atFullEffect(0.99)
+				.atDay(100, 0.8)
+		);
+		group.getOrAddParams(VaccinationType.vector)
+		.setDaysBeforeFullEffect(30)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(10, 0.4)
+				.atDay(20, 0.75)
+				.atFullEffect(0.99)
+				.atDay(100, 0.8)
+		);
+		
+		//group.set
+		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv");
+		group.setCompliancePerAge(vd.createAgeCompliance());
+		group.setVaccinationCapacity_pers_per_day(vd.getVaccinationCapacity());
+		group.setReVaccinationCapacity_pers_per_day(vd.getReVaccinationCapacity());
+		
+		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
+		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
+		strain.setInfectiousness(0.8);
+		strain.setFactorSeriouslySick(0.01);
+		
 		return config;
 	}
 	
