@@ -144,9 +144,10 @@ public class HKScenario extends AbstractModule {
 
 		episimConfig.setInputEventsFile(url);
 
-		LocalDate startDate = LocalDate.of(2020, 2, 20);
+		LocalDate startDate = LocalDate.of(2022, 2, 01);
 
 		episimConfig.setStartDate(startDate);
+		
 		episimConfig.setFacilitiesHandling(EpisimConfigGroup.FacilitiesHandling.bln);
 		episimConfig.setSampleSize(0.01);
 		episimConfig.setCalibrationParameter(2);
@@ -186,6 +187,7 @@ public class HKScenario extends AbstractModule {
 		
 		addDefaultParams(episimConfig,acts);
 		episimConfig.setMaxContacts(4);
+		
 		int spaces = 20;
 		config.controler().setOutputDirectory("HKData/output/0.01Percent");
 		//contact intensities
@@ -251,11 +253,11 @@ public class HKScenario extends AbstractModule {
 		);
 		
 		//group.set
-		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv");
+		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv","vaccinData/owid-covid-data.csv",.1);
 		group.setCompliancePerAge(vd.createAgeCompliance());
 		group.setVaccinationCapacity_pers_per_day(vd.getVaccinationCapacity());
 		group.setReVaccinationCapacity_pers_per_day(vd.getReVaccinationCapacity());
-		
+		episimConfig.setInfections_pers_per_day(vd.getInfections());
 		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
 		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
 		strain.setInfectiousness(0.8);

@@ -17,9 +17,11 @@ import org.matsim.episim.model.VaccinationType;
 public class ReadVaccineData {
 	private Map<LocalDate,VaccineData> data = new HashMap<>();
 	private Map<Integer,Double>ageComp = new HashMap<>();
-	public  ReadVaccineData(String vaccinefileLoc, String ageFileLoc){
+	private Map<LocalDate,Integer> newCases = new HashMap<>();
+	private double scale  = 1.0;
+	public  ReadVaccineData(String vaccinefileLoc, String ageFileLoc, String openWorldDataLoc, double scale){
 		Reader in;
-		
+		this.scale = scale;
 		try {
 			in = new FileReader(vaccinefileLoc);
 			Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
@@ -63,6 +65,38 @@ public class ReadVaccineData {
 					ageComp.put(i, Double.parseDouble(record.get("Dose1")));
 				}
 			}
+			
+			//String fileName = "vaccinData/owid-covid-data.csv";
+			String location = "Hong Kong";//"Canada"
+			
+			in = new FileReader(openWorldDataLoc);
+			records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+			formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			for (CSVRecord record : records) {
+			    LocalDate date = LocalDate.parse(record.get("date"), formatter);
+			    Double newCases = 0.;
+			    if(!record.get("new_cases").equals(""))newCases = Double.parseDouble(record.get("new_cases"));
+			    Double totalCases = 0.;
+			    if(!record.get("total_cases").equals(""))totalCases = Double.parseDouble(record.get("total_cases"));
+			    Double newDeath = 0.;
+			    if(!record.get("new_deaths").equals(""))newDeath = Double.parseDouble(record.get("new_deaths"));
+			    Double totalDeath = 0.;
+			    if(!record.get("total_deaths").equals(""))totalDeath = Double.parseDouble(record.get("total_deaths"));
+			    Double icuPatient = 0.;
+			    if(!record.get("icu_patients").equals(""))icuPatient = Double.parseDouble(record.get("icu_patients"));
+			    Double hospPatient = 0.;
+			    if(!record.get("hosp_patients").equals(""))hospPatient = Double.parseDouble(record.get("hosp_patients"));
+			    Double newTest = 0.;
+			    if(!record.get("new_tests").equals(""))newTest = Double.parseDouble(record.get("new_tests"));
+			    Double totalTest = 0.;
+			    if(!record.get("total_tests").equals(""))totalTest = Double.parseDouble(record.get("total_tests"));
+			    Double peopleVaccinated = 0.;
+			    if(!record.get("people_vaccinated").equals(""))peopleVaccinated = Double.parseDouble(record.get("people_vaccinated"));
+			    Double newVaccinated = 0.;
+			    if(!record.get("new_vaccinations").equals(""))newVaccinated = Double.parseDouble(record.get("new_vaccinations"));
+			    Double boosterVaccinated = peopleVaccinated-newVaccinated;
+			    this.newCases.put(date,(int)Math.floor(newCases));
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,22 +128,27 @@ public class ReadVaccineData {
 	public Map<LocalDate,Integer> getVaccinationCapacity(){
 		Map<LocalDate,Integer> cap = new HashMap<>();
 		for(VaccineData d:this.data.values()) {
-			cap.put(d.date, d.totalVaccine);
+			cap.put(d.date, (int)Math.floor(d.totalVaccine*this.scale));
 		}
 		return cap;
 	}
 	public Map<LocalDate,Integer> getReVaccinationCapacity(){
 		Map<LocalDate,Integer> cap = new HashMap<>();
 		for(VaccineData d:this.data.values()) {
-			cap.put(d.date, d.totalBooster);
+			cap.put(d.date, (int)Math.floor(d.totalBooster*this.scale));
 		}
 		return cap;
 	}
+	public Map<LocalDate,Integer> getInfections(){
+		newCases.entrySet().forEach(e->e.setValue((int)Math.floor(e.getValue()*this.scale)));
+		return this.newCases;
+	}
 	public static void main(String[] args) {
-		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv");
+		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv","vaccinData/owid-covid-data.csv",1.0);
 		Map<LocalDate,Integer> vacCap = vd.getVaccinationCapacity();
 		Map<LocalDate,Integer> reVacCap = vd.getReVaccinationCapacity();
 		Map<LocalDate, Map<VaccinationType, Double>> vacShare = vd.createVaccineShare();
+		Map<LocalDate,Integer> newCases = vd.getInfections();
 		System.out.println("Done!!!");
 	}
 }
