@@ -24,6 +24,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
+import HKScenario.ReadVaccineData;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -31,7 +33,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.episim.EpisimConfigGroup;
 import org.matsim.episim.TracingConfigGroup;
+import org.matsim.episim.VaccinationConfigGroup;
+import org.matsim.episim.VirusStrainConfigGroup;
 import org.matsim.episim.TracingConfigGroup.CapacityType;
+import org.matsim.episim.VirusStrainConfigGroup.StrainParams;
 import org.matsim.episim.model.AgeDependentInfectionModelWithSeasonality;
 import org.matsim.episim.model.ContactModel;
 import org.matsim.episim.model.DefaultFaceMaskModel;
@@ -41,6 +46,8 @@ import org.matsim.episim.model.FaceMaskModel;
 import org.matsim.episim.model.InfectionModel;
 import org.matsim.episim.model.SymmetricContactModel;
 import org.matsim.episim.model.Transition;
+import org.matsim.episim.model.VaccinationType;
+import org.matsim.episim.model.VirusStrain;
 import org.matsim.episim.model.progression.AgeDependentDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DefaultDiseaseStatusTransitionModel;
 import org.matsim.episim.model.progression.DiseaseStatusTransitionModel;
@@ -131,7 +138,7 @@ public class MTLScenario extends AbstractModule {
 
 		episimConfig.setInputEventsFile(url);
 
-		LocalDate startDate = LocalDate.of(2020, 2, 20);
+		LocalDate startDate = LocalDate.of(2022, 2, 01);
 
 		episimConfig.setStartDate(startDate);
 		episimConfig.setFacilitiesHandling(EpisimConfigGroup.FacilitiesHandling.bln);
@@ -160,9 +167,10 @@ public class MTLScenario extends AbstractModule {
 		long closingIteration = 14;
 
 		addDefaultParams(episimConfig,acts);
-
+		episimConfig.setMaxContacts(4);
+		
 		int spaces = 20;
-		config.controler().setOutputDirectory("MontrealData/output/0.01Percent");
+		config.controler().setOutputDirectory("MontrealData/output/0.05Percent");
 		//contact intensities
 		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(10.0).setSpacesPerFacility(spaces);
 		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.47).setSpacesPerFacility(spaces);
@@ -199,6 +207,49 @@ public class MTLScenario extends AbstractModule {
 					LocalDate.of(2020, 6, 15), tracingCapacity
 			));
 		}
+		
+		VaccinationConfigGroup group = ConfigUtils.addOrGetModule(config, VaccinationConfigGroup.class);
+		group.getOrAddParams(VaccinationType.mRNA)
+		.setDaysBeforeFullEffect(30)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(10, 0.5)
+				.atDay(20, 0.8)
+				.atFullEffect(0.99)
+				.atDay(100, 0.8)
+		);
+		group.getOrAddParams(VaccinationType.vector)
+		.setDaysBeforeFullEffect(30)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(10, 0.4)
+				.atDay(20, 0.7)
+				.atFullEffect(0.90)
+				.atDay(100, 0.75)
+		);
+		group.getOrAddParams(VaccinationType.generic)
+		.setDaysBeforeFullEffect(30)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(10, 0.3)
+				.atDay(20, 0.5)
+				.atFullEffect(0.65)
+				.atDay(100, 0.6)
+		);
+		
+		//group.set
+		String vaccineFileLoc = "MontrealData/vaccineData/VaccineMontreal.csv";// vaccination per day in Montreal
+		String vaccineAgeFileLoc = "MontrealData/vaccineData/QuebecVaccinationRateFirstDose.csv";//Distribution of age for vaccinated and non vaccinated people
+		String vaccineTypeFileLoc = "MontrealData/vaccineData/vaccination-distribution.csv";//Distribution of vaccine in Quebec province over days
+		String infectionFileLoc = "MontrealData/vaccineData/MontrealConfirmedCases.csv";//Infection per day in Montreal
+		ReadMontrealData mtlData = new ReadMontrealData(vaccineFileLoc,vaccineAgeFileLoc,vaccineTypeFileLoc,infectionFileLoc,.05);
+		
+		group.setCompliancePerAge(mtlData.getAgeCompliance(startDate));
+		group.setVaccinationCapacity_pers_per_day(mtlData.getVaccineCount());
+		group.setReVaccinationCapacity_pers_per_day(mtlData.getReVaccineCount());
+		episimConfig.setInfections_pers_per_day(mtlData.getInfection());
+		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
+		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
+		strain.setInfectiousness(0.8);
+		strain.setFactorSeriouslySick(0.01);
+		
 		return config;
 	}
 	

@@ -63,6 +63,7 @@ import org.matsim.scenarioCreation.DownloadGoogleMobilityReport;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -149,7 +150,7 @@ public class HKScenario extends AbstractModule {
 		episimConfig.setStartDate(startDate);
 		
 		episimConfig.setFacilitiesHandling(EpisimConfigGroup.FacilitiesHandling.bln);
-		episimConfig.setSampleSize(0.01);
+		episimConfig.setSampleSize(0.1);
 		episimConfig.setCalibrationParameter(2);
 		
 		episimConfig.setHospitalFactor(0.5);
@@ -189,7 +190,7 @@ public class HKScenario extends AbstractModule {
 		episimConfig.setMaxContacts(4);
 		
 		int spaces = 20;
-		config.controler().setOutputDirectory("HKData/output/0.01Percent");
+		config.controler().setOutputDirectory("HKData/output/0.1Percent");
 		//contact intensities
 		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(10.0).setSpacesPerFacility(spaces);
 		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.47).setSpacesPerFacility(spaces);
@@ -252,12 +253,13 @@ public class HKScenario extends AbstractModule {
 				.atDay(100, 0.8)
 		);
 		
+		
 		//group.set
 		ReadVaccineData vd = new ReadVaccineData("vaccinData/HKVac_new.csv", "vaccinData/Age_complianceHK.csv","vaccinData/owid-covid-data.csv",.1);
 		group.setCompliancePerAge(vd.createAgeCompliance());
 		group.setVaccinationCapacity_pers_per_day(vd.getVaccinationCapacity());
 		group.setReVaccinationCapacity_pers_per_day(vd.getReVaccinationCapacity());
-		episimConfig.setInfections_pers_per_day(vd.getInfections());
+		episimConfig.setInfections_pers_per_day(VirusStrain.OMICRON,vd.getInfections());
 		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
 		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
 		strain.setInfectiousness(0.8);
