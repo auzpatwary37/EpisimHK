@@ -30,7 +30,7 @@ public class CreateRestrictionsFromMobilityDataHK implements RestrictionInput {
 			"grocery_and_pharmacy", List.of("shopping", "errand"),
 			"parks", List.of("park"),
 			"residential", List.of("home", "hotel","family"),
-			"retail_and_recreation", List.of("leisure", "restaurant", "shop_other", "business","religious"),
+			"retail_and_recreation", List.of("leisure", "restaurant", "shop_other","religious"),
 			"transit_stations", List.of("pt"),
 			"workplaces", List.of("work","education","business")
 	);

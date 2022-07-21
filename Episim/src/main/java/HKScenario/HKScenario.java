@@ -150,10 +150,10 @@ public class HKScenario extends AbstractModule {
 		episimConfig.setStartDate(startDate);
 		
 		episimConfig.setFacilitiesHandling(EpisimConfigGroup.FacilitiesHandling.bln);
-		episimConfig.setSampleSize(0.1);
+		episimConfig.setSampleSize(1.0);
 		episimConfig.setCalibrationParameter(2);
 		
-		episimConfig.setHospitalFactor(0.5);
+		episimConfig.setHospitalFactor(.06);
 		episimConfig.setProgressionConfig(AbstractSnzScenario2020.baseProgressionConfig(Transition.config()).build());
 		//episimConfig.setProgressionConfig(Transition.config()
 		
@@ -169,7 +169,7 @@ public class HKScenario extends AbstractModule {
 				"airport").build());
 		
 		episimConfig.setPolicy(
-				FixedPolicy.config().restrict(startDate, Restriction.ofMask(FaceMask.SURGICAL, .7),
+				FixedPolicy.config().restrict(startDate, Restriction.ofMask(FaceMask.SURGICAL, 0.97),
 				"work",
 				"business",
 				"leisure",
@@ -189,24 +189,24 @@ public class HKScenario extends AbstractModule {
 		addDefaultParams(episimConfig,acts);
 		episimConfig.setMaxContacts(4);
 		
-		int spaces = 20;
+		int spaces = 5;
 		config.controler().setOutputDirectory("HKData/output/0.1Percent");
 		//contact intensities
-		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(10.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.47).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("leisure").setContactIntensity(9.24).setSpacesPerFacility(spaces).setSeasonal(true);
+		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("leisure").setContactIntensity(1.0).setSpacesPerFacility(spaces);
 //		episimConfig.getOrAddContainerParams("restaurant").setContactIntensity(9.24).setSpacesPerFacility(spaces).setSeasonal(true);
-		episimConfig.getOrAddContainerParams("religious").setContactIntensity(11.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("education").setContactIntensity(11.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("restaurants").setContactIntensity(11.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("shopping").setContactIntensity(11.).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("religious").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("education").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("restaurants").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("shopping").setContactIntensity(1.).setSpacesPerFacility(spaces);
 		//episimConfig.getOrAddContainerParams("shop_other").setContactIntensity(0.88).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("park").setContactIntensity(1.47).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("business").setContactIntensity(1.47).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("family").setContactIntensity(9.24).setSpacesPerFacility(spaces); // 33/3.57
+		episimConfig.getOrAddContainerParams("park").setContactIntensity(.5).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("business").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("family").setContactIntensity(1.0).setSpacesPerFacility(spaces); // 33/3.57
 		episimConfig.getOrAddContainerParams("home").setContactIntensity(1.0).setSpacesPerFacility(1); // 33/33
-		episimConfig.getOrAddContainerParams("quarantine_home").setContactIntensity(1.0).setSpacesPerFacility(1); // 33/33
-		
+		episimConfig.getOrAddContainerParams("quarantine_home").setContactIntensity(.3).setSpacesPerFacility(1); // 33/33
+		episimConfig.setCalibrationParameter(.00001);
 //		episimConfig.setPolicy(FixedPolicy.class, FixedPolicy.config()
 //				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "leisure", "education")
 //				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.2), "work", "business", "other")
@@ -228,30 +228,46 @@ public class HKScenario extends AbstractModule {
 			tracingConfig.setTracingDelay_days(5);
 			tracingConfig.setTraceSusceptible(true);
 			tracingConfig.setCapacityType(CapacityType.PER_PERSON);
-			int tracingCapacity = 200;
-			tracingConfig.setTracingCapacity_pers_per_day(Map.of(
-					LocalDate.of(2020, 4, 1), (int) (tracingCapacity * 0.2),
-					LocalDate.of(2020, 6, 15), tracingCapacity
-			));
+			int tracingCapacity = 20000;
+			Map<LocalDate,Integer> trCap = new HashMap<>();
+			for(long i = 0;i<100;i++) {
+				trCap.put(startDate.plusDays(i), (int)tracingCapacity);
+			}
+			tracingConfig.setTracingCapacity_pers_per_day(trCap);
 		}
 		
 		VaccinationConfigGroup group = ConfigUtils.addOrGetModule(config, VaccinationConfigGroup.class);
 		group.getOrAddParams(VaccinationType.mRNA)
-		.setDaysBeforeFullEffect(30)
+		.setDaysBeforeFullEffect(14)
 		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
-				.atDay(10, 0.5)
-				.atDay(20, 0.8)
-				.atFullEffect(0.99)
-				.atDay(100, 0.8)
-		);
+				.atDay(0, 0.)
+				.atDay(3, 0.45)
+				.atDay(5, 0.85)
+				.atFullEffect(0.95)
+		).setBoostEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(0, 0.45)
+				.atDay(3, 0.65)
+				.atDay(5, 0.8)
+				.atFullEffect(0.99))
+		.setFactorSeriouslySick(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atFullEffect(.019))
+		.setFactorShowingSymptoms(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atFullEffect(.33))
+		
+		.setBoostWaitPeriod(180);
 		group.getOrAddParams(VaccinationType.vector)
-		.setDaysBeforeFullEffect(30)
+		.setDaysBeforeFullEffect(14)
 		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
-				.atDay(10, 0.4)
-				.atDay(20, 0.75)
-				.atFullEffect(0.99)
-				.atDay(100, 0.8)
-		);
+				.atDay(0, 0.)
+				.atDay(3, 0.4)
+				.atDay(5, 0.8)
+				.atFullEffect(0.9)
+		).setBoostEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
+				.atDay(0, 0.4)
+				.atDay(3, 0.6)
+				.atDay(5, 0.8)
+				.atFullEffect(0.95))
+		.setBoostWaitPeriod(180);
 		
 		
 		//group.set
@@ -259,11 +275,13 @@ public class HKScenario extends AbstractModule {
 		group.setCompliancePerAge(vd.createAgeCompliance());
 		group.setVaccinationCapacity_pers_per_day(vd.getVaccinationCapacity());
 		group.setReVaccinationCapacity_pers_per_day(vd.getReVaccinationCapacity());
+		group.setVaccinationShare(vd.createVaccineShare());
 		episimConfig.setInfections_pers_per_day(VirusStrain.OMICRON,vd.getInfections());
 		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
 		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
-		strain.setInfectiousness(0.8);
-		strain.setFactorSeriouslySick(0.01);
+		strain.setInfectiousness(1.0);
+		strain.setFactorCritical(.001);
+		strain.setFactorSeriouslySick(0.006);
 		
 		return config;
 	}
