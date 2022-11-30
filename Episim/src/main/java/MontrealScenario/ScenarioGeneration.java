@@ -14,7 +14,7 @@ public class ScenarioGeneration {
 public static void main(String[] args) {
 	String popFile = "MontrealData/output_plans.xml.gz";
 	String eventFile = "MontrealData/output_events.xml.gz";
-	String facilityFile = "MontrealData/output_facilities.xml.gz";
+	String facilityFile = "MontrealData/output_facilitiesV1.xml.gz";
 	String outputFileLoc = "MontrealData/Montreal0.1";
 	String googleDataLoc = "MontrealData/googleData.csv";
 	String weatherDataLoc = "MontrealData/weatherData.csv";
@@ -48,7 +48,7 @@ public static void main(String[] args) {
 			"--output", outputFileLoc
 	};
 
-	//DownSampleScenario.main(args1);
+	DownSampleScenario.main(args1);
 	
 	args1 = new String[]{
 			"--region", "CA",

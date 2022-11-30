@@ -1,12 +1,13 @@
 package HKScenario;
 
+import javax.annotation.Nullable;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.episim.BatchRun;
 import org.matsim.episim.EpisimConfigGroup;
+import org.matsim.episim.TracingConfigGroup;
 import org.matsim.run.RunParallel;
-
-import javax.annotation.Nullable;
 
 /**
  * Example batch for Open Berlin Scenario using multiple seeds, different calibration parameters and a few options.
@@ -16,6 +17,7 @@ public class HKScenarioBatch implements BatchRun<HKScenarioBatch.Params> {
 
 	@Override
 	public HKScenario getBindings(int id, @Nullable Params params) {
+		
 		return new HKScenario();
 	}
 
@@ -34,12 +36,11 @@ public class HKScenarioBatch implements BatchRun<HKScenarioBatch.Params> {
 		EpisimConfigGroup episimConfig = ConfigUtils.addOrGetModule(config, EpisimConfigGroup.class);
 
 		episimConfig.setCalibrationParameter(params.calibrationParameter);
+		
 
 //		// Set the tracing capacity
-//		TracingConfigGroup tracingConfig = ConfigUtils.addOrGetModule(config, TracingConfigGroup.class);
-//		tracingConfig.setTracingCapacity_pers_per_day(Map.of(
-//				LocalDate.of(2020, 4, 1), 30,
-//				LocalDate.of(2020, 6, 15), params.tracingCapacity));
+		TracingConfigGroup tracingConfig = ConfigUtils.addOrGetModule(config, TracingConfigGroup.class);
+		tracingConfig.getTracingCapacity().entrySet().forEach(e->e.setValue((int)params.tracing));
 
 
 		// restrict edu activities
@@ -57,9 +58,11 @@ public class HKScenarioBatch implements BatchRun<HKScenarioBatch.Params> {
 //		@GenerateSeeds(10)
 //		public long seed;
 
-		@Parameter({0.0001, 0.00001, 0.00005})
+		@Parameter({0.000045,.00004,.000035})
 		public double calibrationParameter;
-
+		@Parameter({20000})
+		public double tracing;
+		
 //		@StringParameter({"no", "yes"})
 //		public String holidays;
 

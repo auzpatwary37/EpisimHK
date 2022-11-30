@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -22,17 +23,35 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.scenarioCreation.DownSampleScenario;
 import org.matsim.scenarioCreation.DownloadGoogleMobilityReport;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.UserDataHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -136,6 +155,7 @@ public class ReadAndChangeEventFile{
 		// 3- Make the change on the selected nodes
 		for (int idx = 0; idx < nodes.getLength(); idx++) {
 		    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
+		    ((Element)value).setAttribute("attr_name","attr_value");
 		    String val = value.getNodeValue();
 		    if(actRepl.containsKey(val)) {
 		    	value.setNodeValue(actRepl.get(val));
@@ -144,6 +164,8 @@ public class ReadAndChangeEventFile{
 		    }
 		}
 
+	
+		
 		// 4- Save the result to a new XML doc
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
 		xformer.transform(new DOMSource(doc), new StreamResult(new File(outputFile)));
@@ -172,5 +194,95 @@ public class ReadAndChangeEventFile{
 		DownloadGoogleMobilityReport.main(args1);
 	}
 	
+	public static void readAndModifyEventFile(String eventFileLoc, String outFileLoc, Population pop)  {
+		// 1- Build the doc from the XML file
+				Document doc = null;
+				try {
+					doc = DocumentBuilderFactory.newInstance()
+					            .newDocumentBuilder().parse(new InputSource(IOUtils.getBufferedReader(eventFileLoc)));
+				} catch (SAXException | IOException | ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// 2- Locate the node(s) with xpath
+				XPath xpath = XPathFactory.newInstance().newXPath();
+				NodeList nodes = null;
+				try {
+					nodes = (NodeList)xpath.evaluate("//*[@actType]",
+					                                          doc, XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println(nodes.getLength());
+				// 3- Make the change on the selected nodes
+				for (int idx = 0; idx < nodes.getLength(); idx++) {
+				    Node value = nodes.item(idx).getAttributes().getNamedItem("actType");
+				    String actType = value.getNodeValue();
+				    Id<Link> linkId = Id.createLinkId(nodes.item(idx).getAttributes().getNamedItem("link").getNodeValue());
+				    Id<Person> personId = Id.createPersonId(nodes.item(idx).getAttributes().getNamedItem("person").getNodeValue());
+				    double time = Double.parseDouble(nodes.item(idx).getAttributes().getNamedItem("time").getNodeValue());
+				    String facId = null;
+				    for(PlanElement pe :pop.getPersons().get(personId).getSelectedPlan().getPlanElements()) {
+				    	if(pe instanceof Activity) {
+				    		Activity a = (Activity)pe;
+				    		if(a.getType().equals(actType) && a.getLinkId().equals(linkId)) {
+				    			facId = a.getFacilityId().toString();
+				    		}
+				    	}
+				    }
+				    ((Element)nodes.item(idx)).setAttribute("facility",facId);
+				}
+
+			
+				
+				// 4- Save the result to a new XML doc
+				Transformer xformer = null;
+				try {
+					xformer = TransformerFactory.newInstance().newTransformer();
+				} catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					xformer.transform(new DOMSource(doc), new StreamResult(new File(outFileLoc)));
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+	}
 
 }
+//class modifyActTypeAndInsertFacilityHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
+//	
+//	Network originalNet;
+//	Map<String,Network> facNets;
+//	Map<Id<Person>,Id<ActivityFacility>> activeFacId = new HashMap<>();
+//	
+//	@Override
+//	public void handleEvent(ActivityEndEvent event) {
+//		
+//	}
+//
+//	@Override
+//	public void handleEvent(ActivityStartEvent event) {
+//		
+//		Network facNet = facNets.get(event.getActType());
+//		if(facNet == null) throw new IllegalArgumentException("Could not find a facility network for act type "+event.getActType());
+//		Id<ActivityFacility>facId = null;
+//		org.matsim.api.core.v01.network.Node node = NetworkUtils.getNearestNode(facNet,originalNet.getLinks().get(event.getLinkId()).getCoord());
+//		if(node!=null) {
+//			facId = Id.create(node.getId().toString(), ActivityFacility.class);
+//		}else {
+//			throw new IllegalArgumentException("Could not find a facility for act type "+event.getActType()+" in the facility network.");
+//		}
+//		activeFacId.put(event.getPersonId(), facId);
+//		
+//	}
+//	
+//}
+
+	
+

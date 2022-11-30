@@ -64,6 +64,7 @@ import org.matsim.scenarioCreation.DownloadGoogleMobilityReport;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +148,7 @@ public class MTLScenario extends AbstractModule {
 		
 		episimConfig.setHospitalFactor(0.5);
 		episimConfig.setProgressionConfig(AbstractSnzScenario2020.baseProgressionConfig(Transition.config()).build());
-		CreateRestrictionsFromMobilityDataMontreal mobilityRestriction = new CreateRestrictionsFromMobilityDataMontreal().setInput(new File("HKData/output/HKMobilityReport.csv").toPath());
+		//CreateRestrictionsFromMobilityDataMontreal mobilityRestriction = new CreateRestrictionsFromMobilityDataMontreal().setInput(new File("HKData/output/HKMobilityReport.csv").toPath());
 		
 		episimConfig.setPolicy(
 				FixedPolicy.config().restrict(startDate, Restriction.ofMask(FaceMask.SURGICAL, .75),
@@ -158,36 +159,36 @@ public class MTLScenario extends AbstractModule {
 		
 		
 		
-		try {
-			episimConfig.setPolicy(mobilityRestriction.createPolicy().build());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			episimConfig.setPolicy(mobilityRestriction.createPolicy().build());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		long closingIteration = 14;
 
 		addDefaultParams(episimConfig,acts);
 		episimConfig.setMaxContacts(4);
 		
 		int spaces = 20;
-		config.controler().setOutputDirectory("MontrealData/output/0.05Percent");
+		config.controler().setOutputDirectory("MontrealData/output/0.05Percent_allactOpen");
 		//contact intensities
-		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(10.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.47).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("leisure").setContactIntensity(9.24).setSpacesPerFacility(spaces).setSeasonal(true);
-		episimConfig.getOrAddContainerParams("education").setContactIntensity(11.0).setSpacesPerFacility(spaces);
-		episimConfig.getOrAddContainerParams("shop").setContactIntensity(11.).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("work").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		//episimConfig.getOrAddContainerParams("leisure").setContactIntensity(9.24).setSpacesPerFacility(spaces).setSeasonality(1.0);
+		episimConfig.getOrAddContainerParams("education").setContactIntensity(1.0).setSpacesPerFacility(spaces);
+		episimConfig.getOrAddContainerParams("shop").setContactIntensity(1.).setSpacesPerFacility(spaces);
 		episimConfig.getOrAddContainerParams("home").setContactIntensity(1.0).setSpacesPerFacility(5); // 33/33
 		episimConfig.getOrAddContainerParams("other").setContactIntensity(1.0).setSpacesPerFacility(2); // 33/33
-		
-//		episimConfig.setPolicy(FixedPolicy.class, FixedPolicy.config()
-//				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "leisure", "education")
-//				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.2), "work", "business", "other")
-//				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.3), "shop", "errand")
-//				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.5), "pt")
-//				.restrict(startDate.plusDays(closingIteration + 60), Restriction.none(), DEFAULT_ACTIVITIES)
-//				.build()
-//		);
+		episimConfig.getOrAddContainerParams("quarantine_home").setContactIntensity(.3).setSpacesPerFacility(1);
+		episimConfig.setPolicy(FixedPolicy.class, FixedPolicy.config()
+				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "leisure", "education")
+				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "work", "business", "other")
+				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "shop", "errand")
+				.restrict(startDate.plusDays(closingIteration), Restriction.of(0.0), "pt")
+				.restrict(startDate.plusDays(closingIteration + 60), Restriction.none(), DEFAULT_ACTIVITIES)
+				.build()
+		);
 		if (tracing) {
 			TracingConfigGroup tracingConfig = ConfigUtils.addOrGetModule(config, TracingConfigGroup.class);
 //			int offset = (int) (ChronoUnit.DAYS.between(episimConfig.getStartDate(), LocalDate.parse("2020-04-01")) + 1);
@@ -201,38 +202,46 @@ public class MTLScenario extends AbstractModule {
 			tracingConfig.setTracingDelay_days(5);
 			tracingConfig.setTraceSusceptible(true);
 			tracingConfig.setCapacityType(CapacityType.PER_PERSON);
-			int tracingCapacity = 200;
-			tracingConfig.setTracingCapacity_pers_per_day(Map.of(
-					LocalDate.of(2020, 4, 1), (int) (tracingCapacity * 0.2),
-					LocalDate.of(2020, 6, 15), tracingCapacity
-			));
+			int tracingCapacity = 20000;
+			Map<LocalDate,Integer> trCap = new HashMap<>();
+			for(long i = 0;i<100;i++) {
+				trCap.put(startDate.plusDays(i), (int)tracingCapacity);
+			}
+			tracingConfig.setTracingCapacity_pers_per_day(trCap);
 		}
 		
 		VaccinationConfigGroup group = ConfigUtils.addOrGetModule(config, VaccinationConfigGroup.class);
 		group.getOrAddParams(VaccinationType.mRNA)
-		.setDaysBeforeFullEffect(30)
-		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
-				.atDay(10, 0.5)
-				.atDay(20, 0.8)
-				.atFullEffect(0.99)
-				.atDay(100, 0.8)
-		);
+		.setDaysBeforeFullEffect(14)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atDay(0, 0.)
+				.atDay(3, 0.45)
+				.atDay(5, 0.85)
+				.atFullEffect(0.95)
+		).setBoostEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atDay(0, 0.45)
+				.atDay(3, 0.65)
+				.atDay(5, 0.8)
+				.atFullEffect(0.99))
+		.setFactorSeriouslySick(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atFullEffect(.019))
+		.setFactorShowingSymptoms(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atFullEffect(.33))
+		
+		.setBoostWaitPeriod(180);
 		group.getOrAddParams(VaccinationType.vector)
-		.setDaysBeforeFullEffect(30)
-		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
-				.atDay(10, 0.4)
-				.atDay(20, 0.7)
-				.atFullEffect(0.90)
-				.atDay(100, 0.75)
-		);
-		group.getOrAddParams(VaccinationType.generic)
-		.setDaysBeforeFullEffect(30)
-		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON)
-				.atDay(10, 0.3)
-				.atDay(20, 0.5)
-				.atFullEffect(0.65)
-				.atDay(100, 0.6)
-		);
+		.setDaysBeforeFullEffect(14)
+		.setEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atDay(0, 0.)
+				.atDay(3, 0.4)
+				.atDay(5, 0.8)
+				.atFullEffect(0.9)
+		).setBoostEffectiveness(VaccinationConfigGroup.forStrain(VirusStrain.OMICRON_BA1)
+				.atDay(0, 0.4)
+				.atDay(3, 0.6)
+				.atDay(5, 0.8)
+				.atFullEffect(0.95))
+		.setBoostWaitPeriod(180);
 		
 		//group.set
 		String vaccineFileLoc = "MontrealData/vaccineData/VaccineMontreal.csv";// vaccination per day in Montreal
@@ -241,14 +250,16 @@ public class MTLScenario extends AbstractModule {
 		String infectionFileLoc = "MontrealData/vaccineData/MontrealConfirmedCases.csv";//Infection per day in Montreal
 		ReadMontrealData mtlData = new ReadMontrealData(vaccineFileLoc,vaccineAgeFileLoc,vaccineTypeFileLoc,infectionFileLoc,.05);
 		
+		
 		group.setCompliancePerAge(mtlData.getAgeCompliance(startDate));
 		group.setVaccinationCapacity_pers_per_day(mtlData.getVaccineCount());
 		group.setReVaccinationCapacity_pers_per_day(mtlData.getReVaccineCount());
 		episimConfig.setInfections_pers_per_day(mtlData.getInfection());
 		VirusStrainConfigGroup strainConfig = ConfigUtils.addOrGetModule(config, VirusStrainConfigGroup.class);
-		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON);
-		strain.setInfectiousness(0.8);
-		strain.setFactorSeriouslySick(0.01);
+		StrainParams strain = strainConfig.getOrAddParams(VirusStrain.OMICRON_BA1);
+		strain.setInfectiousness(1.0);
+		strain.setFactorCritical(.001);
+		strain.setFactorSeriouslySick(0.006);
 		
 		return config;
 	}

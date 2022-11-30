@@ -144,7 +144,7 @@ public class MontrealScenario extends AbstractModule {
         //contact intensities
         episimConfig.getOrAddContainerParams("pt", "tr").setContactIntensity(1.0).setSpacesPerFacility(spaces);
         episimConfig.getOrAddContainerParams("work").setContactIntensity(1.47).setSpacesPerFacility(spaces);
-        episimConfig.getOrAddContainerParams("leisure").setContactIntensity(1.24).setSpacesPerFacility(spaces).setSeasonal(true);
+        //episimConfig.getOrAddContainerParams("leisure").setContactIntensity(1.24).setSpacesPerFacility(spaces).setSeasonality(1.0);
 //		episimConfig.getOrAddContainerParams("restaurant").setContactIntensity(9.24).setSpacesPerFacility(spaces).setSeasonal(true);
 //        episimConfig.getOrAddContainerParams("religious").setContactIntensity(11.0).setSpacesPerFacility(spaces);
         episimConfig.getOrAddContainerParams("education").setContactIntensity(1.5).setSpacesPerFacility(spaces);
