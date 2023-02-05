@@ -12,13 +12,14 @@ import org.matsim.scenarioCreation.DownloadWeatherData;
 
 public class ScenarioGeneration {
 public static void main(String[] args) {
-	String popFile = "MontrealData/output_plans.xml.gz";
-	String eventFile = "MontrealData/output_events.xml.gz";
-	String facilityFile = "MontrealData/output_facilitiesV1.xml.gz";
-	String outputFileLoc = "MontrealData/Montreal0.1";
+	String popFile = "MontrealData/montrealCalibrated/output_plans.xml.gz";
+	String eventFile = "MontrealData/montrealCalibrated/output_events.xml.gz";
+	String facilityFile = "MontrealData/montrealCalibrated/output_facilitiesV1.xml.gz";
+	String outputFileLoc = "MontrealData/Montreal0.1New";
 	String googleDataLoc = "MontrealData/googleData.csv";
 	String weatherDataLoc = "MontrealData/weatherData.csv";
-
+	String facilityFileNew = "MontrealData/montrealCalibrated/output_facilities.xml.gz";
+	
 	double scale = 1.0;
 
 	
@@ -56,14 +57,14 @@ public static void main(String[] args) {
 			"--from","2020-02-01",
 			"--output", googleDataLoc
 	};
-	DownloadGoogleMobilityReport.main(args1);
+	//DownloadGoogleMobilityReport.main(args1);
 	
 	args1 = new String[]{ "SOK6B",
 			"--from","2020-02-01",
 			"--output", weatherDataLoc
 	};
 	
-	DownloadWeatherData.main(args1);
+	//DownloadWeatherData.main(args1);
 	
 }
 }

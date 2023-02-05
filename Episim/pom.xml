@@ -352,6 +352,14 @@
                     <artifactId>jaxb-impl</artifactId>
                     <version>2.3.0.1</version>
                 </dependency>
+                
+                <!-- https://mvnrepository.com/artifact/de.xypron.jcobyla/jcobyla -->
+<dependency>
+    <groupId>de.xypron.jcobyla</groupId>
+    <artifactId>jcobyla</artifactId>
+    <version>1.4</version>
+</dependency>
+
             </dependencies>
         </profile>
     </profiles>

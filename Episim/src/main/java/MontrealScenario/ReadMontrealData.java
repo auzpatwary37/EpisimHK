@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.matsim.episim.model.VaccinationType;
+import org.matsim.episim.model.VirusStrain;
 
 public class ReadMontrealData {
 	
@@ -147,11 +148,22 @@ public Map<LocalDate, Map<VaccinationType, Double>> getVaccineType() {
 
 
 public Map<LocalDate, Integer> getInfection() {
-	Map<LocalDate,Integer> infection = new HashMap<>(this.infection);
+	Map<VirusStrain,Map<LocalDate,Integer>> out = new HashMap<>();
+	
+	
 	infection.entrySet().forEach(e->e.setValue((int)Math.floor(e.getValue()*scale)));
+
 	return infection;
 }
 
+public Map<VirusStrain,Map<LocalDate,Integer>> getInfection(VirusStrain vs) {
+	Map<VirusStrain,Map<LocalDate,Integer>> out = new HashMap<>();
+	Map<LocalDate,Integer> infection = new HashMap<>(this.infection);
+	
+	infection.entrySet().forEach(e->e.setValue((int)Math.floor(e.getValue()*scale)));
+	out.put(vs, infection);
+	return out;
+}
 
 public static void main(String[] args) {
 	String vaccineFileLoc = "MontrealData/vaccineData/VaccineMontreal.csv";// vaccination per day in Montreal
